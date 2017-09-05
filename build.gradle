@@ -26,8 +26,8 @@ plugins {
     id 'nebula.maven-scm' version '5.1.1' apply false
     id 'nebula.javadoc-jar' version '5.1.1' apply false
     id 'nebula.source-jar' version '5.1.1' apply false
-    id 'nebula.info' version '3.6.0'
-    id 'nebula.info-owners' version '3.6.0'
+    id 'nebula.info' version '3.6.0' apply false
+    id 'nebula.info-owners' version '3.6.0' apply false
 }
 
 configure(subprojects) { project ->
@@ -183,10 +183,8 @@ configure(subprojects) { project ->
 
         if ( tag || (branch == 'master' && pullRequest == 'false')) {
             if( tag && !isSnapshot ) {
-                println "Publishing to Bintray"
                 bintrayUpload.enabled = true
             } else {
-                println "Publishing to OJO"
                 artifactoryPublish.enabled = true
             }
         }
