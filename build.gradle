@@ -20,18 +20,15 @@ plugins {
     id 'nebula.project' version '3.4.0' apply false
     id "nebula.resolution-rules" version "3.0.3" apply false
 
-    id 'nebula.nebula-bintray' version '3.5.2' apply false
-    id 'nebula.maven-publish' version '5.1.1' apply false
+    id 'nebula.nebula-bintray' version '3.5.2' // apply false
+    id 'nebula.maven-publish' version '5.1.1' // apply false
     id 'nebula.maven-manifest' version '5.1.1' apply false
     id 'nebula.maven-scm' version '5.1.1' apply false
     id 'nebula.javadoc-jar' version '5.1.1' apply false
     id 'nebula.source-jar' version '5.1.1' apply false
     id 'nebula.info' version '3.6.0' apply false
     id 'nebula.info-owners' version '3.6.0' apply false
-    id 'com.jfrog.artifactory' version "latest.release"
 }
-
-
 
 configure(subprojects) { project ->
 
@@ -50,13 +47,9 @@ configure(subprojects) { project ->
     apply plugin: "nebula.info"
     apply plugin: "nebula.info-owners"
 
-    group = "com.digitalascent"
+    group = "com.digitalascent.digitalacent-core"
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    project.plugins.each {
-        println it
-    }
 
     tasks.withType(JavaCompile) {
 
@@ -181,6 +174,7 @@ configure(subprojects) { project ->
         group = "publishing"
         def isSnapshot = version.endsWith("SNAPSHOT")
 
+        project.bintrayUpload.enabled = false
         project.artifactoryPublish.enabled = false
         project.bintrayUpload.enabled = false
 

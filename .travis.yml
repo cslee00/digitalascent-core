@@ -7,7 +7,7 @@ before_install:
 
 install: true
 
-script: ./gradlew release --stacktrace
+script: ./gradlew release --stacktrace --info
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
