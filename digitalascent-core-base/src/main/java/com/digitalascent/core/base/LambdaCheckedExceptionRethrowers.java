@@ -17,15 +17,23 @@
 package com.digitalascent.core.base;
 
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public final class LambdaCheckedExceptionRethrowers {
 
     @FunctionalInterface
     public interface CheckedPredicate<T, E extends Exception> {
-        void test(T t) throws E;
+        boolean test(T t) throws E;
+    }
+
+    @FunctionalInterface
+    public interface CheckedBiPredicate<T, T1, E extends Exception> {
+        boolean test(T t, T1 t1) throws E;
     }
 
     @FunctionalInterface
@@ -44,6 +52,11 @@ public final class LambdaCheckedExceptionRethrowers {
     }
 
     @FunctionalInterface
+    public interface CheckedBiFunction<T, T1, R, E extends Exception> {
+        R apply(T t, T1 t1) throws E;
+    }
+
+    @FunctionalInterface
     public interface CheckedSupplier<T, E extends Exception> {
         T get() throws E;
     }
@@ -53,12 +66,24 @@ public final class LambdaCheckedExceptionRethrowers {
         void run() throws E;
     }
 
-    public static <T, E extends Exception> Consumer<T> rethrowingPredicate(CheckedPredicate<T, E> predicate) {
+    public static <T, E extends Exception> Predicate<T> rethrowingPredicate(CheckedPredicate<T, E> predicate) {
         return t -> {
             try {
-                predicate.test(t);
+                return predicate.test(t);
             } catch (Exception exception) {
                 throwAsUnchecked(exception);
+                return false;
+            }
+        };
+    }
+
+    public static <T, T1, E extends Exception> BiPredicate<T,T1> rethrowingBiPredicate(CheckedBiPredicate<T, T1, E> predicate) {
+        return (t, t1) -> {
+            try {
+                return predicate.test(t,t1);
+            } catch (Exception exception) {
+                throwAsUnchecked(exception);
+                return false;
             }
         };
     }
@@ -94,6 +119,17 @@ public final class LambdaCheckedExceptionRethrowers {
         };
     }
 
+    public static <T, T1, R, E extends Exception> BiFunction<T, T1, R> rethrowingBiFunction(CheckedBiFunction<T, T1, R, E> function) {
+        return (t,t1) -> {
+            try {
+                return function.apply(t,t1);
+            } catch (Exception exception) {
+                throwAsUnchecked(exception);
+                return null;
+            }
+        };
+    }
+
     public static <T, E extends Exception> Supplier<T> rethrowingSupplier(CheckedSupplier<T, E> function) {
         return () -> {
             try {
@@ -105,7 +141,7 @@ public final class LambdaCheckedExceptionRethrowers {
         };
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
     private static <E extends Throwable> void throwAsUnchecked(Exception exception) throws E {
         throw (E) exception;
     }
