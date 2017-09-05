@@ -23,6 +23,6 @@ include "${rootProject.name}-aws-lambda"
 include "${rootProject.name}-aws-lambda-bootstrap"
 include "${rootProject.name}-aws-s3"
 include "${rootProject.name}-aws-ssm"
-//include "${rootProject.name}-aws-sts"
+include "${rootProject.name}-aws-sts"
 
 
