@@ -1,0 +1,265 @@
+/*
+ * Copyright 2017-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id "net.ltgt.errorprone" version "0.0.10" apply false
+
+    id 'nebula.project' version '3.4.0' apply false
+    id "nebula.resolution-rules" version "3.0.3" apply false
+
+    id 'nebula.nebula-bintray' version '3.5.2' apply false
+    id 'nebula.maven-publish' version '5.1.1' apply false
+    id 'nebula.maven-manifest' version '5.1.1' apply false
+    id 'nebula.maven-scm' version '5.1.1' apply false
+    id 'nebula.javadoc-jar' version '5.1.1' apply false
+    id 'nebula.source-jar' version '5.1.1' apply false
+    id 'nebula.info' version '3.6.0'
+    id 'nebula.info-owners' version '3.6.0'
+}
+
+configure(subprojects) { project ->
+
+    apply plugin: "java-library"
+    apply plugin: "groovy"
+    apply plugin: "idea"
+    apply plugin: "net.ltgt.errorprone"
+    apply plugin: "nebula.resolution-rules"
+    apply plugin: "nebula.project"
+    apply plugin: "nebula.nebula-bintray"
+    apply plugin: "nebula.maven-publish"
+    apply plugin: "nebula.maven-manifest"
+    apply plugin: "nebula.maven-scm"
+    apply plugin: "nebula.javadoc-jar"
+    apply plugin: "nebula.source-jar"
+    apply plugin: "nebula.info"
+    apply plugin: "nebula.info-owners"
+
+    group = "com.digitalascent"
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    tasks.withType(JavaCompile) {
+
+        configure(options) {
+            // http://docs.oracle.com/javase/8/docs/technotes/tools/windows/javac.html#BHCJCABJ
+            ext.lintOpts = ["serial", "varargs", "cast", "classfile", "dep-ann", "divzero", "empty", "finally",
+                            "overrides", "path", "processing", "static", "try", "fallthrough", "rawtypes", "deprecation",
+                            "unchecked", "-options"].collect { "-Xlint:${it}" }
+
+            // configure Google Error Prone: https://github.com/tbroyer/gradle-errorprone-plugin, http://errorprone.info/
+            ext.errorProneOptsError = ["AssertFalse", "BigDecimalLiteralDouble", "ConstructorInvokesOverridable",  "EmptyTopLevelDeclaration", "MissingDefault",
+                                       "NonCanonicalStaticMemberImport", "PrimitiveArrayPassedToVarargsMethod", "RedundantThrows", "StaticQualifiedUsingExpression", "StringEquality",
+                                       "UnnecessaryDefaultInEnumSwitch", "WildcardImport", "MultipleTopLevelClasses", "MultiVariableDeclaration", "MixedArrayDimensions", "MethodCanBeStatic",
+                                       "LiteralClassName", "PrivateConstructorForUtilityClass", "PackageLocation", "ConstantField"].collect {
+                "-Xep:${it}:ERROR"
+            }
+
+            // TODO - re-enable once https://github.com/google/error-prone/issues/472 is fixed
+            // "ReturnMissingNullable", "FieldMissingNullable", "ParameterNotNullable",
+
+            // "ConstructorLeaksThis",
+
+            ext.errorProneOptsWarning = [].collect { "-Xep:${it}:WARNING" }
+            ext.errorProneOptsOff = [].collect { "-Xep:${it}:OFF" }
+
+            // http://docs.oracle.com/javase/8/docs/technotes/tools/windows/javac.html
+            // -Werror - terminates compilation when warnings occur
+            ext.generalArgs = ["-Werror"]
+
+            compilerArgs += errorProneOptsError
+            compilerArgs += errorProneOptsWarning
+            compilerArgs += errorProneOptsOff
+            compilerArgs += lintOpts
+            compilerArgs += generalArgs
+            encoding = 'UTF-8'
+        }
+    }
+
+    ext.versions = [
+            "guava" : "23.0",
+            "spring": "5.0.0.M5",
+            "slf4j" : "1.7.25",
+            "awsSdk": "1.11.188",
+            "awsLambda": "1.1.0"
+    ]
+
+    repositories {
+        jcenter()
+        maven { url "http://repo.spring.io/libs-release" }
+        maven { url "http://repo.spring.io/libs-milestone" }
+    }
+
+    dependencies {
+        resolutionRules 'com.netflix.nebula:gradle-resolution-rules:latest.release'
+        implementation group: 'com.google.guava', name: 'guava', version: "${versions.guava}"
+        implementation group: 'org.slf4j', name: 'slf4j-api', version: "${versions.slf4j}"
+
+        testRuntimeOnly group: 'org.slf4j', name: 'slf4j-simple', version: "${versions.slf4j}"
+        testImplementation "org.codehaus.groovy:groovy-all:2.4.12"
+        testImplementation "org.spockframework:spock-core:1.1-groovy-2.4"
+        testRuntimeOnly('com.athaydes:spock-reports:1.3.1') {
+            transitive = false // this avoids affecting version of Groovy/Spock
+        }
+    }
+
+    nebulaResolutionRules {
+        optional = ['slf4j-bridge']
+    }
+
+    javadoc {
+        description = "Generates project-level javadoc for use in -javadoc jar"
+        configure(options) {
+            memberLevel = JavadocMemberLevel.PROTECTED
+            author = true
+            header = project.name
+
+            ext.javadocLinks = [
+                    "http://docs.oracle.com/javase/8/docs/api/",
+                    "http://docs.oracle.com/javaee/7/api/",
+                    "https://google.github.io/guava/releases/${versions.guava}/api/docs/",
+                    "https://docs.spring.io/spring/docs/${versions.spring}/javadoc-api/"
+            ] as String[]
+
+            links(javadocLinks)
+            addStringOption('Xdoclint:none', '-quiet')
+        }
+
+        // Suppress warnings due to cross-module @see and @link references.
+        // Note that global 'api' task does display all warnings.
+        logging.captureStandardError LogLevel.INFO
+        logging.captureStandardOutput LogLevel.INFO  // suppress "## warnings" message
+    }
+
+    contacts {
+        'chris@digitalascent.com' {
+            moniker 'Chris Lee'
+            github 'cslee00'
+            role 'owner'
+            role 'notify'
+        }
+    }
+
+    bintray {
+        dryRun = false
+        pkg {
+            repo = 'com.digitalascent'
+            userOrg = ''
+            websiteUrl = 'https://github.com/cslee00/${project.name}'
+            issueTrackerUrl = 'https://github.com/cslee00/${project.name}/issues'
+            vcsUrl = 'https://github.com/cslee00/${project.name}.git'
+            labels = []
+            version {
+                name = project.version
+                vcsTag = project.version
+                attributes = [:]
+            }
+        }
+    }
+
+    task "release"  {
+        dependsOn = [bintrayUpload,artifactoryPublish]
+        group = "publishing"
+        def isSnapshot = version.endsWith("SNAPSHOT")
+
+        project.artifactoryPublish.enabled = false
+        project.bintrayUpload.enabled = false
+
+        ext.tag = System.getenv("TRAVIS_TAG")
+        ext.branch = System.getenv("TRAVIS_BRANCH")
+        ext.pullRequest = System.getenv("TRAVIS_PULL_REQUEST")
+
+        if ( tag || (branch == 'master' && pullRequest == 'false')) {
+            if( tag && !isSnapshot ) {
+                println "Publishing to Bintray"
+                bintrayUpload.enabled = true
+            } else {
+                println "Publishing to OJO"
+                artifactoryPublish.enabled = true
+            }
+        }
+    }
+}
+
+project('digitalascent-core-base') {
+    dependencies {
+    }
+}
+
+project('digitalascent-core-spring') {
+
+    dependencies {
+        implementation project(':digitalascent-core-base')
+        implementation group: 'org.springframework', name: 'spring-context', version: "${versions.spring}"
+    }
+}
+
+project('digitalascent-core-aws-base') {
+
+    dependencies {
+        implementation(project(':digitalascent-core-base'))
+        implementation group: 'com.amazonaws', name: 'aws-java-sdk-core', version: "${versions.awsSdk}"
+    }
+}
+
+project('digitalascent-core-aws-lambda') {
+
+    dependencies {
+        implementation(project(':digitalascent-core-base'))
+        implementation group: 'com.amazonaws', name: 'aws-lambda-java-core', version: "${versions.awsLambda}"
+    }
+}
+
+project('digitalascent-core-aws-lambda-bootstrap') {
+
+    dependencies {
+        implementation(project(':digitalascent-core-aws-lambda'))
+        implementation(project(':digitalascent-core-aws-ssm'))
+        implementation(project(':digitalascent-core-spring'))
+        implementation(project(':digitalascent-core-base'))
+        implementation group: 'org.springframework', name: 'spring-context', version: "${versions.spring}"
+        implementation group: 'com.amazonaws', name: 'aws-lambda-java-core', version: "${versions.awsLambda}"
+        implementation group: 'com.amazonaws', name: 'aws-java-sdk-ssm', version: "${versions.awsSdk}"
+    }
+}
+
+project('digitalascent-core-aws-ssm') {
+
+    dependencies {
+        implementation(project(':digitalascent-core-base'))
+        api group: 'com.amazonaws', name: 'aws-java-sdk-ssm', version: "${versions.awsSdk}"
+    }
+}
+
+project('digitalascent-core-aws-sts') {
+
+    dependencies {
+        implementation(project(':digitalascent-core-base'))
+        implementation(project(':digitalascent-core-aws-base'))
+        api group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: "${versions.awsSdk}"
+    }
+}
+
+project('digitalascent-core-aws-s3') {
+
+    dependencies {
+        implementation(project(':digitalascent-core-base'))
+        implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: "${versions.awsSdk}"
+    }
+}
+
+wrapper {
+    gradleVersion = "4.1"
+}
