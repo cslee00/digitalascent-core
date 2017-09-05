@@ -28,11 +28,12 @@ plugins {
     id 'nebula.source-jar' version '5.1.1' apply false
     id 'nebula.info' version '3.6.0' apply false
     id 'nebula.info-owners' version '3.6.0' apply false
+    id 'com.jfrog.artifactory' version "latest.release"
 }
 
-configure(subprojects) { project ->
 
-    apply plugin: 'com.jfrog.artifactory' version "latest.release"
+
+configure(subprojects) { project ->
 
     apply plugin: "java-library"
     apply plugin: "groovy"
@@ -52,6 +53,10 @@ configure(subprojects) { project ->
     group = "com.digitalascent"
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
+
+    project.plugins.each {
+        println it
+    }
 
     tasks.withType(JavaCompile) {
 
