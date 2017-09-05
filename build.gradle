@@ -30,11 +30,9 @@ plugins {
     id 'nebula.info-owners' version '3.6.0' apply false
 }
 
-allprojects {
-    apply plugin: 'com.jfrog.artifactory' version "latest.release"
-}
-
 configure(subprojects) { project ->
+
+    apply plugin: 'com.jfrog.artifactory' version "latest.release"
 
     apply plugin: "java-library"
     apply plugin: "groovy"
