@@ -112,11 +112,11 @@ public abstract class AbstractSpringLambdaBootstrapper<I, O> extends AbstractReq
         getLogger().info("Loading from parameter store for prefix {}", prefix);
 
         AWSSimpleSystemsManagement ssm = AWSSimpleSystemsManagementClientBuilder.defaultClient();
-        AwsParameterStoreRepository parameterStoreService = new AwsParameterStoreRepository(ssm);
+        AwsParameterStoreRepository parameterStoreService = new AwsParameterStoreRepository();
 
         DescribeParametersRequest describeParametersRequest = new DescribeParametersRequest();
         // TODO - filter params
-        Set<String> parameterNames = parameterStoreService.describeParameters(describeParametersRequest).map(ParameterMetadata::getName).collect(toImmutableSet());
+        Set<String> parameterNames = parameterStoreService.describeParameters(describeParametersRequest, ssm).map(ParameterMetadata::getName).collect(toImmutableSet());
 
         GetParametersRequest getParametersRequest = new GetParametersRequest();
         getParametersRequest.withNames(parameterNames).withWithDecryption(true);
