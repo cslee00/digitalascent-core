@@ -31,7 +31,7 @@ plugins {
 }
 
 allprojects {
-    apply plugin: 'com.jfrog.artifactory'
+    apply plugin: 'com.jfrog.artifactory' version "latest.release"
 }
 
 configure(subprojects) { project ->
