@@ -33,27 +33,27 @@ public final class LambdaCheckedExceptionRethrowers {
 
     @FunctionalInterface
     public interface CheckedBiPredicate<T, U, E extends Exception> {
-        boolean test(T t, U u) throws E;
+        boolean test(T var1, U var2) throws E;
     }
 
     @FunctionalInterface
     public interface CheckedConsumer<T, E extends Exception> {
-        void accept(T t) throws E;
+        void accept(T var1) throws E;
     }
 
     @FunctionalInterface
     public interface CheckedBiConsumer<T, U, E extends Exception> {
-        void accept(T t, U u) throws E;
+        void accept(T var1, U var2) throws E;
     }
 
     @FunctionalInterface
     public interface CheckedFunction<T, R, E extends Exception> {
-        R apply(T t) throws E;
+        R apply(T var1) throws E;
     }
 
     @FunctionalInterface
     public interface CheckedBiFunction<T, U, R, E extends Exception> {
-        R apply(T t, U u) throws E;
+        R apply(T var1, U var2) throws E;
     }
 
     @FunctionalInterface
@@ -78,9 +78,9 @@ public final class LambdaCheckedExceptionRethrowers {
     }
 
     public static <T, U, E extends Exception> BiPredicate<T, U> rethrowingBiPredicate(CheckedBiPredicate<T, U, E> predicate) {
-        return (t, u) -> {
+        return (var1, var2) -> {
             try {
-                return predicate.test(t, u);
+                return predicate.test(var1, var2);
             } catch (Exception exception) {
                 throwAsUnchecked(exception);
                 return false;
@@ -89,9 +89,9 @@ public final class LambdaCheckedExceptionRethrowers {
     }
 
     public static <T, E extends Exception> Consumer<T> rethrowingConsumer(CheckedConsumer<T, E> consumer) {
-        return t -> {
+        return var1 -> {
             try {
-                consumer.accept(t);
+                consumer.accept(var1);
             } catch (Exception exception) {
                 throwAsUnchecked(exception);
             }
@@ -99,9 +99,9 @@ public final class LambdaCheckedExceptionRethrowers {
     }
 
     public static <T, U, E extends Exception> BiConsumer<T, U> rethrowingBiConsumer(CheckedBiConsumer<T, U, E> biConsumer) {
-        return (t, u) -> {
+        return (var1, var2) -> {
             try {
-                biConsumer.accept(t, u);
+                biConsumer.accept(var1, var2);
             } catch (Exception exception) {
                 throwAsUnchecked(exception);
             }
@@ -120,9 +120,9 @@ public final class LambdaCheckedExceptionRethrowers {
     }
 
     public static <T, U, R, E extends Exception> BiFunction<T, U, R> rethrowingBiFunction(CheckedBiFunction<T, U, R, E> function) {
-        return (t, u) -> {
+        return (var1, var2) -> {
             try {
-                return function.apply(t, u);
+                return function.apply(var1, var2);
             } catch (Exception exception) {
                 throwAsUnchecked(exception);
                 return null;
