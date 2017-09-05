@@ -32,8 +32,8 @@ public final class LambdaCheckedExceptionRethrowers {
     }
 
     @FunctionalInterface
-    public interface CheckedBiPredicate<T, T1, E extends Exception> {
-        boolean test(T t, T1 t1) throws E;
+    public interface CheckedBiPredicate<T, U, E extends Exception> {
+        boolean test(T t, U u) throws E;
     }
 
     @FunctionalInterface
@@ -52,8 +52,8 @@ public final class LambdaCheckedExceptionRethrowers {
     }
 
     @FunctionalInterface
-    public interface CheckedBiFunction<T, T1, R, E extends Exception> {
-        R apply(T t, T1 t1) throws E;
+    public interface CheckedBiFunction<T, U, R, E extends Exception> {
+        R apply(T t, U u) throws E;
     }
 
     @FunctionalInterface
@@ -77,10 +77,10 @@ public final class LambdaCheckedExceptionRethrowers {
         };
     }
 
-    public static <T, T1, E extends Exception> BiPredicate<T,T1> rethrowingBiPredicate(CheckedBiPredicate<T, T1, E> predicate) {
-        return (t, t1) -> {
+    public static <T, U, E extends Exception> BiPredicate<T, U> rethrowingBiPredicate(CheckedBiPredicate<T, U, E> predicate) {
+        return (t, u) -> {
             try {
-                return predicate.test(t,t1);
+                return predicate.test(t, u);
             } catch (Exception exception) {
                 throwAsUnchecked(exception);
                 return false;
@@ -119,10 +119,10 @@ public final class LambdaCheckedExceptionRethrowers {
         };
     }
 
-    public static <T, T1, R, E extends Exception> BiFunction<T, T1, R> rethrowingBiFunction(CheckedBiFunction<T, T1, R, E> function) {
-        return (t,t1) -> {
+    public static <T, U, R, E extends Exception> BiFunction<T, U, R> rethrowingBiFunction(CheckedBiFunction<T, U, R, E> function) {
+        return (t, u) -> {
             try {
-                return function.apply(t,t1);
+                return function.apply(t, u);
             } catch (Exception exception) {
                 throwAsUnchecked(exception);
                 return null;
