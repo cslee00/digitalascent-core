@@ -49,6 +49,12 @@ public final class Threads {
         return defaultThreadFactoryBuilder(threadPoolPrefix).build();
     }
 
+    public static void abortIfInterrupted() throws InterruptedException {
+        if( Thread.currentThread().isInterrupted() ) {
+            throw new InterruptedException("Thread Interrupted");
+        }
+    }
+
     public static Thread.UncaughtExceptionHandler defaultUncaughtExceptionHandler() {
         return DEFAULT_UNCAUGHT_EXCEPTION_HANDLER;
     }
