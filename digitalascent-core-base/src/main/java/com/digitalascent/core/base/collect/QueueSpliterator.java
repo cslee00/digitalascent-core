@@ -30,12 +30,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 final class QueueSpliterator<T> implements Spliterator<T> {
     private final BlockingQueue<T> queue;
     private final T poison;
-    private final Future<?> future;
+    private final Future<?> producerFuture;
 
     QueueSpliterator(BlockingQueue<T> queue, T poison, Future<?> producerFuture) {
         this.queue = checkNotNull(queue);
         this.poison = checkNotNull(poison);
-        this.future = checkNotNull(producerFuture);
+        this.producerFuture = checkNotNull(producerFuture);
     }
 
     @Override
@@ -53,7 +53,7 @@ final class QueueSpliterator<T> implements Spliterator<T> {
         final T next = Uninterruptibles.takeUninterruptibly(queue);
         if (next == poison) {
             try {
-                Uninterruptibles.getUninterruptibly( future );
+                Uninterruptibles.getUninterruptibly(producerFuture);
             } catch (ExecutionException e) {
                 Throwables.throwIfUnchecked(e.getCause());
                 throw new RuntimeException(e.getCause());
