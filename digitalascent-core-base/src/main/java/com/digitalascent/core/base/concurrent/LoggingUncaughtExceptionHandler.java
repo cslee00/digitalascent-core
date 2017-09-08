@@ -18,6 +18,9 @@ package com.digitalascent.core.base.concurrent;
 
 import com.digitalascent.core.base.SimpleApplicationObject;
 
+/**
+ * Uncaught exception handler that logs the thread name & exception
+ */
 final class LoggingUncaughtExceptionHandler extends SimpleApplicationObject implements Thread.UncaughtExceptionHandler {
 
     @Override

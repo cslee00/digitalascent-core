@@ -45,10 +45,24 @@ public final class Threads {
         return builder;
     }
 
+    /**
+     * Provides a default thread factory for use in thread pools.  Threads are named 'prefix-#-#' to uniquely identify them,
+     * with the pool # incrementing for each thread factory.
+     * The default uncaught exception handler is used, logging all uncaught exceptions
+     *
+     * @param threadPoolPrefix prefix for naming threads
+     * @return ThreadFactory
+     */
     public static ThreadFactory defaultThreadFactory(String threadPoolPrefix) {
         return defaultThreadFactoryBuilder(threadPoolPrefix).build();
     }
 
+    /**
+     * Throws InterruptedException if the current thread has been interrupted; useful to place in looping constructs
+     * to abort processing if thread has been externally interrupted.
+     *
+     * @throws InterruptedException
+     */
     public static void abortIfInterrupted() throws InterruptedException {
         if( Thread.currentThread().isInterrupted() ) {
             throw new InterruptedException("Thread Interrupted");
