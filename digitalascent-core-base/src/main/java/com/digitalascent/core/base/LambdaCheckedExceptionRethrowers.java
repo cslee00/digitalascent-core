@@ -24,6 +24,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+/**
+ * Utility methods to wrap functional interfaces used in Streams, rethrowing checked exceptions
+ */
 public final class LambdaCheckedExceptionRethrowers {
 
     @FunctionalInterface
