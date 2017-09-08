@@ -23,6 +23,11 @@ import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Iterator over batches of elements.
+ *
+ * @param <T> type of elements to iterate over
+ */
 final class BatchIterator<T> implements Iterator<Iterable<T>> {
     private final BatchSupplier<T> batchSupplier;
     private Batch<T> currentBatch;

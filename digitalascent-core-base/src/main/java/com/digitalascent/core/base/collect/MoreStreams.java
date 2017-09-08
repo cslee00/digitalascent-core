@@ -36,11 +36,19 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
-@SuppressWarnings("unused")
 public final class MoreStreams {
 
+    /**
+     * Create a stream that synchronously lazy-loads batches of elements from the provided supplier.
+     *
+     * @param batchSupplier the supplier that provides batches to expose in the stream
+     * @param <T> type of element
+     *
+     * @return Stream of elements that are lazy-loaded in batches from the provided supplier
+     */
     public static <T> Stream<T> batchLoadingStream(BatchSupplier<T> batchSupplier) {
-        checkNotNull( batchSupplier );
+        checkNotNull(batchSupplier, "batchSupplier is required");
+
         Stream<Iterable<T>> batchStream = StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(new BatchIterator<>(batchSupplier), Spliterator.ORDERED | Spliterator.IMMUTABLE),
                 false);
@@ -48,8 +56,19 @@ public final class MoreStreams {
         return batchStream.flatMap(i -> StreamSupport.stream(i.spliterator(), false));
     }
 
+    /**
+     * Create a stream that <i>asynchronously</i> lazy-loads batches of elements from the provided supplier.
+     * Useful for suppliers that load batches from API calls to overlap producer network/processing latency
+     * with consumption of batches.
+     *
+     * @param batchSupplier the supplier that provides batches to expose in the stream
+     * @param <T> type of element
+     * @param queueSize number of batches to allow to be queued before blocking the supplier from adding more batches
+     *
+     * @return Stream of elements that are <i>asynchronously</i> lazy-loaded in batches from the provided supplier
+     */
     public static <T> Stream<T> batchLoadingStream(BatchSupplier<T> batchSupplier, int queueSize) {
-        checkNotNull( batchSupplier );
+        checkNotNull(batchSupplier, "batchSupplier is required");
         checkArgument(queueSize > 0, "queueSize must be > 0 : %s", queueSize);
 
         BlockingQueue<Iterable<T>> queue = new ArrayBlockingQueue<>(queueSize);
@@ -89,12 +108,12 @@ public final class MoreStreams {
     /**
      * Creates a stream supplying elements from the provided BlockingQueue, terminating when the <b>poison</b> element is encountered
      *
-     * @param queue
-     * @param poison
-     * @param future
+     * @param queue the queue to extract elements from
+     * @param poison element that terminates the stream
+     * @param producerFuture future for the producer of elements consumed by this queue, used to propagate exceptions
      */
-    private static <T> Stream<T> queueStream(BlockingQueue<T> queue, T poison, Future<?> future) {
-        return StreamSupport.stream(new QueueSpliterator<>(queue, poison, future), false);
+    private static <T> Stream<T> queueStream(BlockingQueue<T> queue, T poison, Future<?> producerFuture) {
+        return StreamSupport.stream(new QueueSpliterator<>(queue, poison, producerFuture), false);
     }
 
     private MoreStreams() {

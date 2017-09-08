@@ -29,7 +29,7 @@ public interface BatchSupplier<T> {
      * return MoreStreams.batchLoadingStream(nextBatchToken -> {
      *      describeParametersRequest.setNextToken(nextBatchToken);
      *      DescribeParametersResult result = ssm.describeParameters(describeParametersRequest);
-     *      return new Batch<>( result.getNextToken(),result.getParameters().iterator() );
+     *      return new Batch<>( result.getNextToken(),result.getParameters() );
      * });
      * </pre>
      *

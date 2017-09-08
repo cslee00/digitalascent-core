@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Spliterator that pulls elements from the provided queue.  Blocks waiting for elements from the queue, exiting
  * when the provided 'poison' element is encountered.  Exceptions from the async producer are propagated.
  *
- * @param <T>
+ * @param <T> type of elements in the queue
  */
 final class QueueSpliterator<T> implements Spliterator<T> {
     private final BlockingQueue<T> queue;
@@ -39,9 +39,9 @@ final class QueueSpliterator<T> implements Spliterator<T> {
     private final Future<?> producerFuture;
 
     QueueSpliterator(BlockingQueue<T> queue, T poison, Future<?> producerFuture) {
-        this.queue = checkNotNull(queue);
-        this.poison = checkNotNull(poison);
-        this.producerFuture = checkNotNull(producerFuture);
+        this.queue = checkNotNull(queue, "queue is required");
+        this.poison = checkNotNull(poison, "poison is required");
+        this.producerFuture = checkNotNull(producerFuture, "producerFuture is required");
     }
 
     @Override
@@ -59,8 +59,10 @@ final class QueueSpliterator<T> implements Spliterator<T> {
         final T next = Uninterruptibles.takeUninterruptibly(queue);
         if (next == poison) {
             try {
+                // obtain result from producer, used to propagate any producer exceptions
                 Uninterruptibles.getUninterruptibly(producerFuture);
             } catch (ExecutionException e) {
+                // propagate producer exception
                 Throwables.throwIfUnchecked(e.getCause());
                 throw new RuntimeException(e.getCause());
             }

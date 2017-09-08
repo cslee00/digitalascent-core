@@ -17,11 +17,19 @@
 package com.digitalascent.core.base.collect;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+
+/**
+ * Represents a batch of elements that can be iterated over.  Contains the 'next' token from the batch provider for loading
+ * the next batch; may be null if there is no next batch.
+ *
+ * @param <T> type of elements in the batch
+ */
 public final class Batch<T> {
     private final String nextToken;
     private final Iterable<T> iterable;
@@ -32,7 +40,7 @@ public final class Batch<T> {
 
     public Batch(@Nullable String nextToken, Iterable<T> iterable) {
         this.nextToken = nextToken;
-        this.iterable = checkNotNull(iterable);
+        this.iterable = Iterables.unmodifiableIterable(iterable);
     }
 
     String getNextToken() {
