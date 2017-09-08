@@ -18,7 +18,6 @@ package com.digitalascent.core.base.collect;
 
 
 import com.digitalascent.core.base.concurrent.Threads;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import java.util.ArrayList;

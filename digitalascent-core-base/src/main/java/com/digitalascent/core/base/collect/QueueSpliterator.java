@@ -27,6 +27,12 @@ import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Spliterator that pulls elements from the provided queue.  Blocks waiting for elements from the queue, exiting
+ * when the provided 'poison' element is encountered.  Exceptions from the async producer are propagated.
+ *
+ * @param <T>
+ */
 final class QueueSpliterator<T> implements Spliterator<T> {
     private final BlockingQueue<T> queue;
     private final T poison;
