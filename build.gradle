@@ -47,7 +47,7 @@ configure(subprojects) { project ->
     apply plugin: "nebula.info"
     apply plugin: "nebula.info-owners"
 
-    group = "com.digitalascent.digitalacent-core"
+    group = "com.digitalascent.core"
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
