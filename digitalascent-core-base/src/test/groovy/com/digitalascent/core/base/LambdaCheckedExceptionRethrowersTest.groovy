@@ -20,10 +20,12 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import java.lang.reflect.UndeclaredThrowableException
+import java.util.function.BiFunction
 import java.util.function.BiPredicate
 import java.util.stream.Collectors
 
 import static com.digitalascent.core.base.LambdaCheckedExceptionRethrowers.rethrowingBiConsumer
+import static com.digitalascent.core.base.LambdaCheckedExceptionRethrowers.rethrowingBiFunction
 import static com.digitalascent.core.base.LambdaCheckedExceptionRethrowers.rethrowingBiPredicate
 import static com.digitalascent.core.base.LambdaCheckedExceptionRethrowers.rethrowingConsumer
 import static com.digitalascent.core.base.LambdaCheckedExceptionRethrowers.rethrowingFunction
@@ -122,6 +124,25 @@ class LambdaCheckedExceptionRethrowersTest extends Specification {
         thrown IOException
     }
 
+    def "unhandled checked bifunction throws exception"() {
+        when:
+        BiFunction biFunction = { a, b -> multiply(a)}
+        biFunction.apply(1,2)
+
+        then:
+        UndeclaredThrowableException exception = thrown()
+        exception.cause instanceof IOException
+    }
+
+    def "rethrowing checked bifunction throws exception"() {
+        when:
+        BiFunction biFunction = rethrowingBiFunction({ a, b -> multiply(a)})
+        biFunction.apply(1,2)
+
+        then:
+        thrown IOException
+    }
+
 
     boolean checkIt( int i ) throws IOException {
         if (i > 0) {
@@ -134,7 +155,7 @@ class LambdaCheckedExceptionRethrowersTest extends Specification {
         if( i > 0 ) {
             throw new IOException()
         }
-        return i * 2;
+        return i * 2
     }
 
     void doSomething(int i) throws IOException {
