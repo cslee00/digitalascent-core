@@ -144,6 +144,16 @@ public final class LambdaCheckedExceptionRethrowers {
         };
     }
 
+    public static <E extends Exception> Runnable rethrowingRunnable(CheckedRunnable<E> runnable) {
+        return () -> {
+            try {
+                runnable.run();
+            } catch (Exception exception) {
+                throwAsUnchecked(exception);
+            }
+        };
+    }
+
     @SuppressWarnings({"unchecked", "ConstantConditions"})
     private static <E extends Throwable> void throwAsUnchecked(Exception exception) throws E {
         throw (E) exception;
