@@ -20,10 +20,13 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import java.lang.reflect.UndeclaredThrowableException
+import java.util.function.BiPredicate
 import java.util.stream.Collectors
 
 import static com.digitalascent.core.base.LambdaCheckedExceptionRethrowers.rethrowingBiConsumer
+import static com.digitalascent.core.base.LambdaCheckedExceptionRethrowers.rethrowingBiPredicate
 import static com.digitalascent.core.base.LambdaCheckedExceptionRethrowers.rethrowingConsumer
+import static com.digitalascent.core.base.LambdaCheckedExceptionRethrowers.rethrowingFunction
 import static com.digitalascent.core.base.LambdaCheckedExceptionRethrowers.rethrowingPredicate
 
 class LambdaCheckedExceptionRethrowersTest extends Specification {
@@ -83,10 +86,55 @@ class LambdaCheckedExceptionRethrowersTest extends Specification {
         thrown IOException
     }
 
+    def "unhandled checked bipredicate throws exception"() {
+        when:
+        BiPredicate biPredicate = { a, b ->  checkIt(a) }
+        biPredicate.test(1,2)
+
+        then:
+        UndeclaredThrowableException exception = thrown()
+        exception.cause instanceof IOException
+    }
+
+    def "rethrowing checked bipredicate throws exception"() {
+        when:
+        BiPredicate biPredicate = rethrowingBiPredicate({ a, b ->  checkIt(a) })
+        biPredicate.test(1,2)
+
+        then:
+        thrown IOException
+    }
+
+    def "unhandled checked function throws exception"() {
+        when:
+        list.stream().map( {a -> multiply(a)}).collect(Collectors.toList())
+
+        then:
+        UndeclaredThrowableException exception = thrown()
+        exception.cause instanceof IOException
+    }
+
+    def "rethrowing checked function throws exception"() {
+        when:
+        list.stream().map( rethrowingFunction({a -> multiply(a)})).collect(Collectors.toList())
+
+        then:
+        thrown IOException
+    }
+
+
     boolean checkIt( int i ) throws IOException {
         if (i > 0) {
             throw new IOException()
         }
+        return false
+    }
+
+    int multiply( int i ) throws IOException {
+        if( i > 0 ) {
+            throw new IOException()
+        }
+        return i * 2;
     }
 
     void doSomething(int i) throws IOException {
