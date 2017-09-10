@@ -78,8 +78,15 @@ public final class Threads {
     }
 
     /**
-     * Invoke the provided callable, using the supplied thread context to modify the calling thread name
-     * for the duration of the call (reverting to original name when call is completed)
+     * Invoke the provided callable (in the calling thread), using the supplied thread context to
+     * modify the calling thread name for the duration of the call (reverting to original name when
+     * call is completed).
+     *
+     * The following defaults are added to the context:
+     *  "timestamp": current timestamp in UTC, ISO8601 (from Instant.now())
+     *  "originalThreadName": contains the original name of the thread prior to invocation
+     *
+     * The thread name is JSON-encoded.
      *
      * @param threadContext
      * @param callable
