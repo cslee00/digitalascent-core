@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-rootProject.name = 'digitalascent-core'
+@CheckReturnValue
+@ParametersAreNonnullByDefault
+package com.digitalacent.core.web;
 
-include "${rootProject.name}-base"
-include "${rootProject.name}-web"
-include "${rootProject.name}-spring"
-
-include "${rootProject.name}-aws-base"
-include "${rootProject.name}-aws-lambda"
-include "${rootProject.name}-aws-lambda-bootstrap"
-include "${rootProject.name}-aws-s3"
-include "${rootProject.name}-aws-ssm"
-include "${rootProject.name}-aws-sts"
-
-
+import javax.annotation.CheckReturnValue;
+import javax.annotation.ParametersAreNonnullByDefault;

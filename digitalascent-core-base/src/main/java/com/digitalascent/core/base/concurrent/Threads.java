@@ -114,6 +114,14 @@ public final class Threads {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static <T> void invokeWithThreadContext(Map<String, Object> threadContext, Runnable runnable ) {
+        invokeWithThreadContext(threadContext, () -> {
+            runnable.run();
+            return null;
+        });
+    }
+
 
     private Threads() {
         throw new AssertionError("Cannot instantiate " + getClass());
