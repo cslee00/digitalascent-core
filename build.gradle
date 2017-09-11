@@ -180,7 +180,28 @@ configure(subprojects) { project ->
     }
 
 
-    gradle.taskGraph.whenReady { taskGraph ->
+    task "publishArtifacts"  {
+        dependsOn = [release,bintrayUpload,artifactoryPublish]
+        group = "publishing"
+        def isSnapshot = version.endsWith("SNAPSHOT")
+
+        project.bintrayUpload.enabled = false
+        project.artifactoryPublish.enabled = false
+        project.bintrayUpload.enabled = false
+
+        ext.tag = System.getenv("TRAVIS_TAG")
+        ext.branch = System.getenv("TRAVIS_BRANCH")
+        ext.pullRequest = System.getenv("TRAVIS_PULL_REQUEST")
+
+        if ( tag || (branch == 'master' && pullRequest == 'false')) {
+            if( tag && !isSnapshot ) {
+                bintrayUpload.enabled = true
+            } else {
+                artifactoryPublish.enabled = true
+            }
+        }
+    }
+   /* gradle.taskGraph.whenReady { taskGraph ->
 //        release.dependsOn = [bintrayUpload,artifactoryPublish]
         bintrayUpload.enabled = false
         artifactoryPublish.enabled = false
@@ -199,7 +220,7 @@ configure(subprojects) { project ->
             }
         }
 
-    }
+    }*/
 }
 
 project('digitalascent-core-base') {
