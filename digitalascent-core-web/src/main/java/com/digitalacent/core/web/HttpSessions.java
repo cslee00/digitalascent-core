@@ -35,6 +35,7 @@ public final class HttpSessions {
         return attribute( request.getSession(false), attributeName, type );
     }
 
+    @SuppressWarnings("unchecked")
     @Nonnull
     public static <T> Optional<T> attribute(@Nullable HttpSession session, String attributeName, Class<T> type ) {
         checkArgument(!isNullOrEmpty(attributeName), "attributeName is required to be non-null & not empty: %s", attributeName);
