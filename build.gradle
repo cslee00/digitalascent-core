@@ -56,7 +56,7 @@ configure(subprojects) { project ->
     apply plugin: "nebula.info"
     apply plugin: "nebula.info-owners"
 
-    group = "com.digitalascent.core"
+    group = "com.digitalascent.digitalascent-core"
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
     version = scmVersion.version
@@ -165,7 +165,7 @@ configure(subprojects) { project ->
     bintray {
         dryRun = false
         pkg {
-            repo = 'com.digitalascent/digitalascent-core'
+            repo = 'com.digitalascent'
             userOrg = ''
             websiteUrl = 'https://github.com/cslee00/${project.name}'
             issueTrackerUrl = 'https://github.com/cslee00/${project.name}/issues'
