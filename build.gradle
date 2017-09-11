@@ -181,7 +181,7 @@ configure(subprojects) { project ->
 
 
     gradle.taskGraph.whenReady { taskGraph ->
-        release.dependsOn = [bintrayUpload,artifactoryPublish]
+//        release.dependsOn = [bintrayUpload,artifactoryPublish]
         bintrayUpload.enabled = false
         artifactoryPublish.enabled = false
 
