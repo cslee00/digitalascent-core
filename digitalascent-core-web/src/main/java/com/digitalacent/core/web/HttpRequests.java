@@ -55,11 +55,6 @@ public final class HttpRequests {
         checkNotNull(request, "request is required");
         checkArgument(!isNullOrEmpty(cookieName), "headerName is required to be non-null & not empty: %s", cookieName);
 
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return Optional.empty();
-        }
-
         return cookies(request).filter(cookie -> Objects.equals(cookie.getName(), cookieName)).findFirst();
     }
 
