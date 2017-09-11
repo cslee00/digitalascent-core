@@ -165,7 +165,7 @@ configure(subprojects) { project ->
     bintray {
         dryRun = false
         pkg {
-            repo = 'com.digitalascent'
+            repo = 'com.digitalascent.digitalascent-core'
             userOrg = ''
             websiteUrl = 'https://github.com/cslee00/${project.name}'
             issueTrackerUrl = 'https://github.com/cslee00/${project.name}/issues'
