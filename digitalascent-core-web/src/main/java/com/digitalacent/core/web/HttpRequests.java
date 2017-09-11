@@ -16,6 +16,9 @@
 
 package com.digitalacent.core.web;
 
+import com.google.common.base.Predicates;
+import com.google.common.net.HttpHeaders;
+
 import javax.annotation.Nonnull;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +39,21 @@ public final class HttpRequests {
         checkArgument(!isNullOrEmpty(headerName), "headerName is required to be non-null & not empty: %s", headerName);
 
         return Optional.ofNullable(request.getHeader(headerName));
+    }
+
+    /**
+     * Returns the first header value from the supplied list of header names
+     *
+     * @param request
+     * @param headerNames
+     * @return
+     */
+    @Nonnull
+    public static Optional<String> headerValue(HttpServletRequest request, String... headerNames) {
+        checkNotNull(request, "request is required");
+        checkNotNull(headerNames, "headerNames is required");
+
+        return Arrays.stream(headerNames).map(request::getHeader).filter(Objects::nonNull).findFirst();
     }
 
     @Nonnull
