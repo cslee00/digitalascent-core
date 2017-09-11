@@ -16,9 +16,6 @@
 
 package com.digitalacent.core.web;
 
-import com.google.common.base.Predicates;
-import com.google.common.net.HttpHeaders;
-
 import javax.annotation.Nonnull;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -62,7 +59,7 @@ public final class HttpRequests {
 
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            return Stream.of();
+            return Stream.empty();
         }
 
         return Arrays.stream(cookies);
