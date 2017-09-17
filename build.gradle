@@ -102,8 +102,14 @@ configure(subprojects) { project ->
             "guava" : "23.0",
             "spring": "5.0.0.M5",
             "slf4j" : "1.7.25",
-            "awsSdk": "1.11.188",
-            "awsLambda": "1.1.0"
+            "awsSdk": "2.0.0-preview-2",
+//            "awsSdk": "1.11.188",
+            "awsLambda": "1.1.0",
+            "servletApi": "3.1.0"
+    ]
+
+    ext.groups = [
+            "awsSdk": "software.amazon.awssdk"
     ]
 
     repositories {
@@ -212,7 +218,7 @@ project('digitalascent-core-base') {
 project('digitalascent-core-web') {
     dependencies {
         implementation(project(':digitalascent-core-base'))
-        compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+        compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: versions.servletApi
     }
 }
 
@@ -221,7 +227,7 @@ project('digitalascent-core-spring') {
 
     dependencies {
         implementation project(':digitalascent-core-base')
-        implementation group: 'org.springframework', name: 'spring-context', version: "${versions.spring}"
+        implementation group: 'org.springframework', name: 'spring-context', version: versions.spring
     }
 }
 
@@ -229,7 +235,7 @@ project('digitalascent-core-aws-base') {
 
     dependencies {
         implementation(project(':digitalascent-core-base'))
-        implementation group: 'com.amazonaws', name: 'aws-java-sdk-core', version: "${versions.awsSdk}"
+        implementation group: groups.awsSdk, name: 'core', version: versions.awsSdk
     }
 }
 
@@ -237,7 +243,7 @@ project('digitalascent-core-aws-lambda') {
 
     dependencies {
         implementation(project(':digitalascent-core-base'))
-        implementation group: 'com.amazonaws', name: 'aws-lambda-java-core', version: "${versions.awsLambda}"
+        implementation group: groups.awsSdk, name: 'lambda', version: versions.awsSdk
     }
 }
 
@@ -248,9 +254,9 @@ project('digitalascent-core-aws-lambda-bootstrap') {
         implementation(project(':digitalascent-core-aws-ssm'))
         implementation(project(':digitalascent-core-spring'))
         implementation(project(':digitalascent-core-base'))
-        implementation group: 'org.springframework', name: 'spring-context', version: "${versions.spring}"
-        implementation group: 'com.amazonaws', name: 'aws-lambda-java-core', version: "${versions.awsLambda}"
-        implementation group: 'com.amazonaws', name: 'aws-java-sdk-ssm', version: "${versions.awsSdk}"
+        implementation group: 'org.springframework', name: 'spring-context', version: versions.spring
+        implementation group: groups.awsSdk, name: 'lambda', version: versions.awsSdk
+        implementation group: groups.awsSdk, name: 'ssm', version: versions.awsSdk
     }
 }
 
@@ -258,7 +264,7 @@ project('digitalascent-core-aws-ssm') {
 
     dependencies {
         implementation(project(':digitalascent-core-base'))
-        api group: 'com.amazonaws', name: 'aws-java-sdk-ssm', version: "${versions.awsSdk}"
+        api group: groups.awsSdk, name: 'ssm', version: versions.awsSdk
     }
 }
 
@@ -267,7 +273,7 @@ project('digitalascent-core-aws-sts') {
     dependencies {
         implementation(project(':digitalascent-core-base'))
         implementation(project(':digitalascent-core-aws-base'))
-        api group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: "${versions.awsSdk}"
+        api group: groups.awsSdk, name: 'sts', version: versions.awsSdk
     }
 }
 
@@ -275,7 +281,7 @@ project('digitalascent-core-aws-s3') {
 
     dependencies {
         implementation(project(':digitalascent-core-base'))
-        implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: "${versions.awsSdk}"
+        implementation group: groups.awsSdk, name: 's3', version: versions.awsSdk
     }
 }
 

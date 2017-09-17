@@ -16,6 +16,7 @@
 
 package com.digitalascent.core.base.collect
 
+import com.google.common.base.VerifyException
 import com.google.common.collect.Lists
 import spock.lang.Specification
 
@@ -69,7 +70,7 @@ class BatchLoadingSpliteratorTest extends Specification {
         when:
         def lists = Lists.partition(1..100, 6)
         int idx = 0
-        def stream = MoreStreams.batchLoadingStream({ nextToken ->
+        def stream = MoreStreams.queuedBatchLoadingStream({ nextToken ->
             return new Batch<>(idx == lists.size() - 1 ? null : idx.toString(), lists.get(idx++))
         },5)
         def finalList = stream.collect(Collectors.toList())
@@ -82,7 +83,7 @@ class BatchLoadingSpliteratorTest extends Specification {
     def "iteration over single batch works async"() {
         when:
         def list = 1..100
-        def stream = MoreStreams.batchLoadingStream({ nextToken ->
+        def stream = MoreStreams.queuedBatchLoadingStream({ nextToken ->
             return new Batch<>(null , list)
         },5)
         def finalList = stream.collect(Collectors.toList())
@@ -95,13 +96,13 @@ class BatchLoadingSpliteratorTest extends Specification {
     def "iteration over batches fails when token repeated async"() {
         when:
 
-        def stream = MoreStreams.batchLoadingStream({ nextToken ->
+        def stream = MoreStreams.queuedBatchLoadingStream({ nextToken ->
             return new Batch<>("abc", [])
         },5)
         stream.collect(Collectors.toList())
 
         then:
-        thrown(IllegalStateException.class)
+        thrown(VerifyException.class)
 
     }
 }

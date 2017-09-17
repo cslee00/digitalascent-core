@@ -18,6 +18,7 @@ package com.digitalascent.core.base.collect;
 
 
 import com.digitalascent.core.base.concurrent.Threads;
+import com.google.common.base.Verify;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import java.util.ArrayList;
@@ -42,8 +43,7 @@ public final class MoreStreams {
      * Create a stream that synchronously lazy-loads batches of elements from the provided supplier.
      *
      * @param batchSupplier the supplier that provides batches to expose in the stream
-     * @param <T> type of element
-     *
+     * @param <T>           type of element
      * @return Stream of elements that are lazy-loaded in batches from the provided supplier
      */
     public static <T> Stream<T> batchLoadingStream(BatchSupplier<T> batchSupplier) {
@@ -62,12 +62,11 @@ public final class MoreStreams {
      * with consumption of batches.
      *
      * @param batchSupplier the supplier that provides batches to expose in the stream
-     * @param <T> type of element
-     * @param queueSize number of batches to allow to be queued before blocking the supplier from adding more batches
-     *
+     * @param <T>           type of element
+     * @param queueSize     number of batches to allow to be queued before blocking the supplier from adding more batches
      * @return Stream of elements that are <i>asynchronously</i> lazy-loaded in batches from the provided supplier
      */
-    public static <T> Stream<T> batchLoadingStream(BatchSupplier<T> batchSupplier, int queueSize) {
+    public static <T> Stream<T> queuedBatchLoadingStream(BatchSupplier<T> batchSupplier, int queueSize) {
         checkNotNull(batchSupplier, "batchSupplier is required");
         checkArgument(queueSize > 0, "queueSize must be > 0 : %s", queueSize);
 
@@ -84,14 +83,12 @@ public final class MoreStreams {
                 String lastToken = null;
                 while (!done) {
                     currentBatch = batchSupplier.nextBatch(currentBatch.getNextToken());
+
                     verify(currentBatch != null, "Null batch returned from %s", batchSupplier.getClass());
+                    verify(lastToken == null || !Objects.equals(lastToken, currentBatch.getNextToken()), "Received the same batch token '%s' for two batches, aborting", lastToken);
+
                     Uninterruptibles.putUninterruptibly(queue, currentBatch.getIterable());
                     done = currentBatch.getNextToken() == null;
-
-                    if (lastToken != null && Objects.equals(lastToken, currentBatch.getNextToken())) {
-                        throw new IllegalStateException(String.format("Received the same batch token '%s' for two batches, aborting", lastToken));
-                    }
-
                     lastToken = currentBatch.getNextToken();
                 }
             } finally {
@@ -108,8 +105,8 @@ public final class MoreStreams {
     /**
      * Creates a stream supplying elements from the provided BlockingQueue, terminating when the <b>poison</b> element is encountered
      *
-     * @param queue the queue to extract elements from
-     * @param poison element that terminates the stream
+     * @param queue          the queue to extract elements from
+     * @param poison         element that terminates the stream
      * @param producerFuture future for the producer of elements consumed by this queue, used to propagate exceptions
      */
     private static <T> Stream<T> queueStream(BlockingQueue<T> queue, T poison, Future<?> producerFuture) {
