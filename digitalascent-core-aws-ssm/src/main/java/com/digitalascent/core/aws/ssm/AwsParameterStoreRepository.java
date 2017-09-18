@@ -17,21 +17,11 @@
 package com.digitalascent.core.aws.ssm;
 
 
-import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagement;
-import com.amazonaws.services.simplesystemsmanagement.model.DescribeParametersRequest;
-import com.amazonaws.services.simplesystemsmanagement.model.DescribeParametersResult;
-import com.amazonaws.services.simplesystemsmanagement.model.ParameterMetadata;
 import com.digitalascent.core.base.SimpleApplicationObject;
-import com.digitalascent.core.base.collect.Batch;
-import com.digitalascent.core.base.collect.MoreStreams;
-
-import java.util.stream.Stream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class AwsParameterStoreRepository extends SimpleApplicationObject {
 
-    public Stream<ParameterMetadata> describeParameters(DescribeParametersRequest describeParametersRequest, AWSSimpleSystemsManagement ssm) {
+/*    public Stream<ParameterMetadata> describeParameters(DescribeParametersRequest describeParametersRequest, AWSSimpleSystemsManagement ssm) {
         checkNotNull(describeParametersRequest, "describeParametersRequest is required");
         checkNotNull(ssm, "ssm is required");
 
@@ -40,5 +30,5 @@ public final class AwsParameterStoreRepository extends SimpleApplicationObject {
             DescribeParametersResult result = ssm.describeParameters(describeParametersRequest);
             return new Batch<>( result.getNextToken(),result.getParameters() );
         });
-    }
+    }*/
 }

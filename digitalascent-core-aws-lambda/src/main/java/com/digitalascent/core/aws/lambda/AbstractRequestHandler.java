@@ -17,8 +17,6 @@
 package com.digitalascent.core.aws.lambda;
 
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.digitalascent.core.base.SimpleApplicationObject;
 import com.google.common.base.Stopwatch;
 

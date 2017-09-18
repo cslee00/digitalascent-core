@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-rootProject.name = 'digitalascent-core'
+package com.digitalascent.core.base.collect;
 
-include "${rootProject.name}-base"
-include "${rootProject.name}-web"
-include "${rootProject.name}-spring"
+import javax.annotation.Nullable;
+import java.util.concurrent.CompletableFuture;
 
-include "${rootProject.name}-aws-base"
-//include "${rootProject.name}-aws-lambda"
-//include "${rootProject.name}-aws-lambda-bootstrap"
-include "${rootProject.name}-aws-s3"
-include "${rootProject.name}-aws-ssm"
-include "${rootProject.name}-aws-sts"
-
-
+@FunctionalInterface
+public interface ContinuableResponseSource<ResponseT> {
+    CompletableFuture<ResponseT> invoke( @Nullable  String continuationToken);
+}

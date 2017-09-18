@@ -18,7 +18,6 @@ package com.digitalascent.core.base.collect;
 
 
 import com.digitalascent.core.base.concurrent.Threads;
-import com.google.common.base.Verify;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import java.util.ArrayList;
@@ -92,7 +91,7 @@ public final class MoreStreams {
                     lastToken = currentBatch.getNextToken();
                 }
             } finally {
-                // always poison the queue, notifying consumer that this producer is finished, even in the event of an exception here
+                // always poison the queue, notifying consumer that this producer is finished, even in the event of an exception here (which will propagate to consumer)
                 Uninterruptibles.putUninterruptibly(queue, poison);
             }
         });
