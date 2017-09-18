@@ -29,6 +29,7 @@ import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Spliterator that allows to async IO retrieval of source elements in a chained continuation-token model, where the first response
@@ -89,7 +90,7 @@ public final class ContinuationTokenSpliterator<ResponseT> extends SimpleApplica
             }
 
             String nextContinuationToken = continuationTokenExtractor.apply(continuableResponse);
-            if( nextContinuationToken != null ) {
+            if(!isNullOrEmpty(nextContinuationToken)) {
                 invokeRequest(nextContinuationToken);
             } else {
                 // done - terminate queue consumer
