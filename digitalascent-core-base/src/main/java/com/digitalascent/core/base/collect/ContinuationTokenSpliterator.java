@@ -30,6 +30,16 @@ import java.util.function.Function;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Spliterator that allows to async IO retrieval of source elements in a chained continuation-token model, where the first response
+ * contains an optional continuation token to be used in a subsequent request.  Async calls are made via a ContinuableResponseSource
+ * with up to the specified number of results outstanding in a queue before calls will block, waiting for the stream to consume responses.
+ *
+ * This allows the latency of API calls to be overlapped with processing earlier API results, while providing a simple Stream interface
+ * to API responses.
+ *
+ * @param <ResponseT>
+ */
 public final class ContinuationTokenSpliterator<ResponseT> extends SimpleApplicationObject implements Spliterator<CompletableFuture<ResponseT>> {
 
     private final CompletableFuture<ResponseT> poison = new CompletableFuture<>();
@@ -72,7 +82,8 @@ public final class ContinuationTokenSpliterator<ResponseT> extends SimpleApplica
         // callback to chain next API call using continuation token from previous call
         completableFuture.whenComplete((continuableResponse, exception) -> {
             if( continuableResponse == null || exception != null ) {
-                // error condition
+                // error condition; exception will be propagated to consumer when it get()s this future
+                // just in case we poison the queue to avoid a deadlock
                 Uninterruptibles.putUninterruptibly(queue, poison);
                 return;
             }
