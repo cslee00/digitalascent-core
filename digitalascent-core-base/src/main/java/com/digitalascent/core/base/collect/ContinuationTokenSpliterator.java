@@ -32,11 +32,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
- * Spliterator that allows to async IO retrieval of source elements in a chained continuation-token model, where the first response
+ * Spliterator that provides async IO retrieval of source elements in a chained continuation-token model, where the first response
  * contains an optional continuation token to be used in a subsequent request.  Async calls are made via a ContinuableResponseSource
- * with up to the specified number of results outstanding in a queue before calls will block, waiting for the stream to consume responses.
+ * with up to the specified number of responses outstanding in a queue before blocking, waiting for the stream to consume responses.
  *
- * This allows the latency of API calls to be overlapped with processing earlier API results, while providing a simple Stream interface
+ * This allows the latency of API calls to be overlapped with processing earlier API results, while providing a Stream interface
  * to API responses.
  *
  * @param <ResponseT>

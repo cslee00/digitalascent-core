@@ -21,5 +21,5 @@ import java.util.concurrent.CompletableFuture;
 
 @FunctionalInterface
 public interface ContinuableResponseSource<ResponseT> {
-    CompletableFuture<ResponseT> invoke( @Nullable  String continuationToken);
+    CompletableFuture<ResponseT> invoke( @Nullable String continuationToken);
 }
