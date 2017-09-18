@@ -64,6 +64,7 @@ public final class ContinuationTokenSpliterator<ResponseT> extends SimpleApplica
         return true;
     }
 
+    @SuppressWarnings("FutureReturnValueIgnored")
     private void invokeRequest(@Nullable String continuationToken) {
         CompletableFuture<ResponseT> completableFuture = continuableResponseSource.invoke(continuationToken);
         Uninterruptibles.putUninterruptibly(queue, completableFuture);
