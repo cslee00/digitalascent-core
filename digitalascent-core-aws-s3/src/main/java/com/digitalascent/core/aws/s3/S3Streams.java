@@ -33,8 +33,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class S3Streams {
 
-    public static Stream<ListObjectsV2Response> listObjectsV2(ListObjectsV2Request.Builder builder, S3AsyncClient s3Client) {
-        checkNotNull(builder, "builder is required");
+    public static Stream<ListObjectsV2Response> listObjectsV2(ListObjectsV2Request.Builder requestBuilder, S3AsyncClient s3Client) {
+        checkNotNull(requestBuilder, "requestBuilder is required");
         checkNotNull(s3Client, "s3Client is required");
 
         return StreamSupport.stream(new ContinuationTokenSpliterator<>((ListObjectsV2Response previousResponse) -> {
@@ -42,10 +42,10 @@ public final class S3Streams {
                 // response is complete, no need to make further requests
                 return null;
             }
-            builder.continuationToken(previousResponse != null ? previousResponse.nextContinuationToken() : null );
+            // set new continuation token (possibly null, in the case of the first request)
+            requestBuilder.continuationToken(previousResponse != null ? previousResponse.nextContinuationToken() : null );
 
-            ListObjectsV2Request request = builder.build();
-            return s3Client.listObjectsV2(request);
+            return s3Client.listObjectsV2(requestBuilder.build());
         }, 5), false).map(rethrowingFunction(CompletableFuture::get));
     }
 
