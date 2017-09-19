@@ -286,7 +286,7 @@ project('digitalascent-core-aws-s3') {
     dependencies {
         implementation(project(':digitalascent-core-base'))
         implementation group: groups.awsSdk, name: 's3', version: versions.awsSdk
-//        implementation group: 'io.projectreactor', name: 'reactor-core', version: versions.reactor
+        implementation group: 'io.projectreactor', name: 'reactor-core', version: versions.reactor
 
     }
 }

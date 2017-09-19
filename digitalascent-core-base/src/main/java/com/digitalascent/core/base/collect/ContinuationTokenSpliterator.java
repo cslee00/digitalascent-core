@@ -35,9 +35,17 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * Spliterator that provides async IO retrieval of source elements in a chained continuation-token model, where the first response
  * contains an optional continuation token to be used in a subsequent request.  Async calls are made via a ContinuableResponseSource
  * with up to the specified number of responses outstanding in a queue before blocking, waiting for the stream to consume responses.
- *
+ * <p>
  * This allows the latency of API calls to be overlapped with processing earlier API results, while providing a Stream interface
  * to API responses.
+ * </p>
+ * <pre>
+ * return StreamSupport.stream(new ContinuationTokenSpliterator<>((nextContinuationToken) -> {
+ *      builder.continuationToken(nextContinuationToken);
+ *      ListObjectsV2Request request = builder.build();
+ *      return s3Client.listObjectsV2(request);
+ * }, ListObjectsV2Response::nextContinuationToken, 5), false).map(rethrowingFunction(CompletableFuture::get));
+ * </pre>
  *
  * @param <ResponseT>
  */
