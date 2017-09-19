@@ -22,7 +22,9 @@ import software.amazon.awssdk.services.s3.model.CommonPrefix;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -35,11 +37,16 @@ public final class S3Streams {
         checkNotNull(builder, "builder is required");
         checkNotNull(s3Client, "s3Client is required");
 
-        return StreamSupport.stream(new ContinuationTokenSpliterator<>((nextContinuationToken) -> {
-            builder.continuationToken(nextContinuationToken);
+        return StreamSupport.stream(new ContinuationTokenSpliterator<>((ListObjectsV2Response previousResponse) -> {
+            if (previousResponse != null && !previousResponse.isTruncated()) {
+                // response is complete, no need to make further requests
+                return null;
+            }
+            builder.continuationToken(previousResponse != null ? previousResponse.nextContinuationToken() : null );
+
             ListObjectsV2Request request = builder.build();
             return s3Client.listObjectsV2(request);
-        }, ListObjectsV2Response::nextContinuationToken, 5), false).map(rethrowingFunction(CompletableFuture::get));
+        }, 5), false).map(rethrowingFunction(CompletableFuture::get));
     }
 
     public static Stream<String> listCommonPrefixesStream(ListObjectsV2Request.Builder builder, S3AsyncClient s3Client) {

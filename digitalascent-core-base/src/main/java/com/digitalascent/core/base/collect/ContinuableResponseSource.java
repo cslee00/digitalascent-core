@@ -17,9 +17,12 @@
 package com.digitalascent.core.base.collect;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @FunctionalInterface
 public interface ContinuableResponseSource<ResponseT> {
-    CompletableFuture<ResponseT> invoke( @Nullable String continuationToken);
+
+
+    @Nullable CompletableFuture<ResponseT> invoke( @Nullable ResponseT previousResponse);
 }

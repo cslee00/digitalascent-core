@@ -25,11 +25,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Spliterator that provides async IO retrieval of source elements in a chained continuation-token model, where the first response
@@ -54,13 +52,11 @@ public final class ContinuationTokenSpliterator<ResponseT> extends SimpleApplica
     private final CompletableFuture<ResponseT> poison = new CompletableFuture<>();
     private final BlockingQueue<CompletableFuture<ResponseT>> queue;
     private final ContinuableResponseSource<ResponseT> continuableResponseSource;
-    private final Function<ResponseT,String> continuationTokenExtractor;
 
     private boolean firstAdvance = true;
 
-    public ContinuationTokenSpliterator(ContinuableResponseSource<ResponseT> continuableResponseSource, Function<ResponseT, String> continuationTokenExtractor, int queueSize) {
+    public ContinuationTokenSpliterator(ContinuableResponseSource<ResponseT> continuableResponseSource, int queueSize) {
         this.continuableResponseSource = checkNotNull(continuableResponseSource, "continuableResponseSource is required");
-        this.continuationTokenExtractor = checkNotNull(continuationTokenExtractor, "continuationTokenExtractor is required");
 
         checkArgument(queueSize > 0, "queueSize > 0 : %s", queueSize);
         this.queue = new ArrayBlockingQueue<>(queueSize);
@@ -84,8 +80,13 @@ public final class ContinuationTokenSpliterator<ResponseT> extends SimpleApplica
     }
 
     @SuppressWarnings("FutureReturnValueIgnored")
-    private void invokeRequest(@Nullable String continuationToken) {
-        CompletableFuture<ResponseT> completableFuture = continuableResponseSource.invoke(continuationToken);
+    private void invokeRequest(@Nullable ResponseT previousResponse) {
+        CompletableFuture<ResponseT> completableFuture = continuableResponseSource.invoke(previousResponse);
+        if( completableFuture == null ) {
+            // done - terminate queue consumer
+            Uninterruptibles.putUninterruptibly(queue, poison);
+            return;
+        }
         Uninterruptibles.putUninterruptibly(queue, completableFuture);
 
         // callback to chain next API call using continuation token from previous call
@@ -96,14 +97,7 @@ public final class ContinuationTokenSpliterator<ResponseT> extends SimpleApplica
                 Uninterruptibles.putUninterruptibly(queue, poison);
                 return;
             }
-
-            String nextContinuationToken = continuationTokenExtractor.apply(continuableResponse);
-            if(!isNullOrEmpty(nextContinuationToken)) {
-                invokeRequest(nextContinuationToken);
-            } else {
-                // done - terminate queue consumer
-                Uninterruptibles.putUninterruptibly(queue, poison);
-            }
+            invokeRequest(continuableResponse);
         });
     }
 
