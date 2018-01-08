@@ -91,7 +91,8 @@ configure(subprojects) { project ->
 
             // http://docs.oracle.com/javase/8/docs/technotes/tools/windows/javac.html
             // -Werror - terminates compilation when warnings occur
-            ext.generalArgs = ["-Werror"]
+            ext.generalArgs = []
+//            ext.generalArgs = ["-Werror"]
 
             compilerArgs += errorProneOptsError
             compilerArgs += errorProneOptsWarning
