@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-rootProject.name = 'digitalascent-core'
+package com.digitalascent.core.aws.lamdba.framework;
 
-include "${rootProject.name}-base"
-include "${rootProject.name}-web"
-include "${rootProject.name}-spring"
+import com.digitalascent.core.aws.lamdba.framework.exception.UnprocessableEntityException;
 
-include "${rootProject.name}-aws-base"
-include "${rootProject.name}-aws-lambda"
-//include "${rootProject.name}-aws-lambda"
-//include "${rootProject.name}-aws-lambda-bootstrap"
-include "${rootProject.name}-aws-s3"
-include "${rootProject.name}-aws-ssm"
-include "${rootProject.name}-aws-sts"
-
-
+public interface RequestValidator {
+    void validate(Object request) throws UnprocessableEntityException;
+}

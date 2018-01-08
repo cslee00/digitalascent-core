@@ -29,6 +29,9 @@ plugins {
     id 'nebula.info' version '3.6.0' apply false
     id 'nebula.info-owners' version '3.6.0' apply false
 
+    id "io.spring.dependency-management" version "1.0.4.RELEASE" apply false
+
+
     id 'pl.allegro.tech.build.axion-release' version '1.7.1'
 }
 
@@ -55,6 +58,7 @@ configure(subprojects) { project ->
     apply plugin: "nebula.source-jar"
     apply plugin: "nebula.info"
     apply plugin: "nebula.info-owners"
+    apply plugin: "io.spring.dependency-management"
 
     group = "com.digitalascent.digitalascent-core"
     sourceCompatibility = 1.8
@@ -73,7 +77,7 @@ configure(subprojects) { project ->
             ext.errorProneOptsError = ["AssertFalse", "BigDecimalLiteralDouble", "ConstructorInvokesOverridable",  "EmptyTopLevelDeclaration", "MissingDefault",
                                        "NonCanonicalStaticMemberImport", "PrimitiveArrayPassedToVarargsMethod", "RedundantThrows", "StaticQualifiedUsingExpression", "StringEquality",
                                        "UnnecessaryDefaultInEnumSwitch", "WildcardImport", "MultipleTopLevelClasses", "MultiVariableDeclaration", "MixedArrayDimensions", "MethodCanBeStatic",
-                                       "LiteralClassName", "PrivateConstructorForUtilityClass", "PackageLocation", "ConstantField"].collect {
+                                       "PrivateConstructorForUtilityClass", "PackageLocation", "ConstantField"].collect {
                 "-Xep:${it}:ERROR"
             }
 
@@ -99,12 +103,16 @@ configure(subprojects) { project ->
     }
 
     ext.versions = [
-            "guava" : "23.0",
+            "guava" : "23.6-jre",
             "spring": "5.0.0.M5",
             "slf4j" : "1.7.25",
             "awsSdk": "2.0.0-preview-2",
             "servletApi": "3.1.0",
-            "reactor": "3.0.7.RELEASE"
+            "reactor": "3.0.7.RELEASE",
+            "jackson": "2.8.9",
+            "awsLambda": "1.1.0",
+            "log4j2" : "2.8.2",
+            "hibernateValidator": "6.0.7.Final"
     ]
 
     ext.groups = [
@@ -239,15 +247,43 @@ project('digitalascent-core-aws-base') {
     }
 }
 
-/*
+
 project('digitalascent-core-aws-lambda') {
+    dependencyManagement {
+        imports {
+            mavenBom('com.amazonaws:aws-java-sdk-bom:1.11.258')
+            mavenBom('com.amazonaws:aws-xray-recorder-sdk-bom:1.3.0')
+        }
+    }
 
     dependencies {
         implementation(project(':digitalascent-core-base'))
 //        implementation group: groups.awsSdk, name: 'lambda', version: versions.awsSdk
+
+        api "com.fasterxml.jackson.core:jackson-core:${versions.jackson}"
+        implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}"
+        api "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}"
+
+        implementation group: 'com.amazonaws', name: 'aws-lambda-java-log4j2', version: "${versions.awsLambda}"
+        api group:  'com.amazonaws', name:  'aws-lambda-java-core', version: "${versions.awsLambda}"
+//    compile group: 'com.amazonaws', name: 'aws-java-sdk-ec2', version: "${versions.awsSdk}"
+//    compile group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: "${versions.awsSdk}"
+
+        implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j2
+        implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: versions.log4j2
+
+        implementation group: "org.hibernate", name: "hibernate-validator", version: versions.hibernateValidator
+        implementation group: "org.hibernate", name: "hibernate-validator-annotation-processor", version: versions.hibernateValidator
+
+//        compile group: 'com.digitalascent.digitalascent-core', name: 'digitalascent-core-base', version: '0.2.7'
+
+        api("com.amazonaws:aws-xray-recorder-sdk-core")
+        implementation("com.amazonaws:aws-xray-recorder-sdk-aws-sdk")
+        implementation("com.amazonaws:aws-xray-recorder-sdk-aws-sdk-instrumentor")
+        api("com.amazonaws:aws-xray-recorder-sdk-apache-http")
     }
 }
-*/
+
 /*
 project('digitalascent-core-aws-lambda-bootstrap') {
 

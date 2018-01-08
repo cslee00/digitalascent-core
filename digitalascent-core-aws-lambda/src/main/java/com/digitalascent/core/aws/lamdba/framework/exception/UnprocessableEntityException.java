@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.digitalascent.core.aws.lambda;
+package com.digitalascent.core.aws.lamdba.framework.exception;
 
+public final class UnprocessableEntityException extends RuntimeException {
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.digitalascent.core.base.SimpleApplicationObject;
-
-import java.util.function.BiFunction;
-
-public abstract class AbstractAwsLamdbaFunction<I, O> extends SimpleApplicationObject implements BiFunction<I, Context, O> {
-
-    @Override
-    public O apply(I request, Context context) {
-        return internalApply(request, context);
+    public UnprocessableEntityException(String message) {
+        super(message);
     }
 
-    protected abstract O internalApply(I request, Context context);
+    public UnprocessableEntityException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public UnprocessableEntityException(Throwable cause) {
+        super(cause);
+    }
 }
