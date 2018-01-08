@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 
-@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
+@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction","ConstructorInvokesOverridable"})
 public abstract class AbstractLambdaRequestHandler<Request,Response> extends SimpleApplicationObject implements LambdaRequestHandler<Request,Response> {
     private final LambdaInvoker lambdaInvoker;
 
