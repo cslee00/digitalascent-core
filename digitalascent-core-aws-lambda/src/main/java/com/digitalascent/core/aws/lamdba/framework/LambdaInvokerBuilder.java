@@ -93,7 +93,7 @@ public final class LambdaInvokerBuilder<Request, Response> {
         return this;
     }
 
-    public LambdaInvokerBuilder<Request, Response> withObjectMapperCustomizer(ObjectMapperCustomizer customizer) {
+    public LambdaInvokerBuilder<Request, Response> withObjectMapperCustomizer(ObjectMapperCustomizer objectMapperCustomizer) {
         this.objectMapperCustomizer = checkNotNull(objectMapperCustomizer, "objectMapperCustomizer is required");
         return this;
     }
