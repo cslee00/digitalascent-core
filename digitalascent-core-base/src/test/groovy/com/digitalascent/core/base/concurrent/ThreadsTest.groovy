@@ -19,17 +19,19 @@ package com.digitalascent.core.base.concurrent
 import groovy.json.JsonSlurper
 import spock.lang.Specification
 
+import java.util.concurrent.Callable
+
 class ThreadsTest extends Specification {
 
     def "invokeWithThreadContext renames thread properly"() {
         when:
-        def threadName = Threads.invokeWithThreadContext(["a":"b"],{ -> return Thread.currentThread().getName()})
+        def threadName = Threads.invokeWithThreadContext(["a":"b"], (Callable){ -> return Thread.currentThread().getName()})
         def response = new JsonSlurper().parseText(threadName)
 
         then:
         threadName != null
         response["timestamp"]  != null
-        response["originalThreadName"] == "main"
+        response["originalThreadName"] == "Test worker"
         response["a"] == "b"
         response.keySet() == ["timestamp","a","originalThreadName"] as Set
     }
