@@ -54,6 +54,7 @@ final class DefaultLambdaInvoker<Request, Response> extends SimpleApplicationObj
         this.requestHandler = checkNotNull(requestHandler, "requestHandler is required");
     }
 
+    @Override
     public void invoke(InputStream inputStream, OutputStream outputStream, Context context) {
         Request request = null;
         try {

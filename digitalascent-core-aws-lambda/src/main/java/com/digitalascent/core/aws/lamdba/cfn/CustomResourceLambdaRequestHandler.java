@@ -42,8 +42,6 @@ public abstract class CustomResourceLambdaRequestHandler extends AbstractLambdaR
     protected final void customizeBuilder(LambdaInvokerBuilder<CustomResourceRequest, CustomResourceResponse> builder) {
         builder.withObjectMapperCustomizer(objectMapper -> {
             objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
-            objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-            objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         });
 
         builder.withResponseHandler(((request, response, outputStream, context, objectMapper) -> writeResponse(request, response, objectMapper)));

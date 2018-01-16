@@ -21,7 +21,9 @@ import com.digitalascent.core.aws.lamdba.framework.json.JacksonObjectMapperReque
 import com.digitalascent.core.aws.lamdba.framework.json.JacksonObjectMapperResponseHandler;
 import com.digitalascent.core.aws.lamdba.framework.validation.ChainedRequestValidator;
 import com.digitalascent.core.aws.lamdba.framework.validation.DefaultRequestValidator;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
@@ -106,6 +108,11 @@ public final class LambdaInvokerBuilder<Request, Response> {
 
         // serialization options
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+
+        // use fields directly, allowing domain object to be immutable (no setters)
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
         objectMapperCustomizer.customize(objectMapper);
         return objectMapper;
